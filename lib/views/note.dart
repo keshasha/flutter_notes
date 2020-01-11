@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_notes/inherited_widgets/note_inherited_widget.dart';
+import 'package:flutter_notes/providers/note_provider.dart';
 
 enum NoteMode { Adding, Editing }
 
 class Note extends StatefulWidget {
   final NoteMode noteMode;
-  final int index;
+  final Map<String, dynamic> notes;
 
-  Note(this.noteMode, this.index);
+  Note(this.noteMode, this.notes);
 
   @override
   _NoteState createState() => _NoteState();
@@ -22,8 +23,8 @@ class _NoteState extends State<Note> {
   @override
   void didChangeDependencies() {
     if (widget.noteMode == NoteMode.Editing) {
-      _titleController.text = _notes[widget.index]['title'];
-      _textController.text = _notes[widget.index]['text'];
+      _titleController.text = widget.notes['title'];
+      _textController.text = widget.notes['text'];
     }
     super.didChangeDependencies();
   }
@@ -61,9 +62,13 @@ class _NoteState extends State<Note> {
                   final title = _titleController.text;
                   final text = _textController.text;
                   if (widget?.noteMode == NoteMode.Adding) {
-                    _notes.add({'title': title, 'text': text});
+                    NoteProvider.insertNote({'title': title, 'text': text});
                   } else if (widget?.noteMode == NoteMode.Editing) {
-                    _notes[widget.index] = {'title': title, 'text': text};
+                    NoteProvider.updateNote({
+                      'id': widget.notes['id'],
+                      'title': title,
+                      'text': text
+                    });
                   }
                   Navigator.of(context).pop();
                 }),
@@ -72,7 +77,7 @@ class _NoteState extends State<Note> {
                 }),
                 widget.noteMode == NoteMode.Editing
                     ? _NoteButton('Delete', Colors.red, () {
-                        _notes.removeAt(widget.index);
+                      NoteProvider.deleteNote(widget.notes['id']);
                         Navigator.of(context).pop();
                       })
                     : Container(),

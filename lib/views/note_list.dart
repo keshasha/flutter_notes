@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_notes/inherited_widgets/note_inherited_widget.dart';
+import 'package:flutter_notes/providers/note_provider.dart';
 import 'package:flutter_notes/views/note.dart';
 
 class NoteList extends StatefulWidget {
@@ -8,44 +9,52 @@ class NoteList extends StatefulWidget {
 }
 
 class _NoteListState extends State<NoteList> {
-  List<Map<String, String>> get _notes => NoteInheritedWidget.of(context).notes;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notes'),
       ),
-      body: ListView.builder(
-          itemCount: _notes.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Note(NoteMode.Editing, index)));
-              },
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 30, bottom: 30, left: 13, right: 22),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _NoteTitle(_notes[index]['title']),
-                      Container(
-                        height: 4,
+      body: FutureBuilder(
+        future: NoteProvider.getNoteList(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            final notes = snapshot.data;
+            return ListView.builder(
+                itemCount: notes.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => Note(NoteMode.Editing, notes[index])));
+                    },
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 30, bottom: 30, left: 13, right: 22),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            _NoteTitle(notes[index]['title']),
+                            Container(
+                              height: 4,
+                            ),
+                            _NoteText(notes[index]['text'])
+                          ],
+                        ),
                       ),
-                      _NoteText(_notes[index]['text'])
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
+                    ),
+                  );
+                });
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => Note(NoteMode.Adding, null)));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => Note(NoteMode.Adding, null)));
         },
         child: Icon(Icons.add),
       ),
