@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_notes/inherited_widgets/note_inherited_widget.dart';
 import 'package:flutter_notes/providers/note_provider.dart';
 import 'package:flutter_notes/views/note.dart';
 

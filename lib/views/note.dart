@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_notes/inherited_widgets/note_inherited_widget.dart';
 import 'package:flutter_notes/providers/note_provider.dart';
 
 enum NoteMode { Adding, Editing }
@@ -17,8 +16,6 @@ class Note extends StatefulWidget {
 class _NoteState extends State<Note> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
-
-  List<Map<String, String>> get _notes => NoteInheritedWidget.of(context).notes;
 
   @override
   void didChangeDependencies() {
