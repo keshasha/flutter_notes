@@ -12,10 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MaterialApp(
-          title: 'Notes',
-          home: NoteList(),
-      ),
+      home: NoteList()
     );
   }
 }
